@@ -41,7 +41,7 @@ struct _NiveauDonjon {
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M  M   M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
@@ -210,23 +210,23 @@ struct _Heros {
 
             textureActuelle = 0;
             IdTex = G2D::InitTextureFromString(Size, textureMarche);
-            Size = Size * 5; // on peut zoomer la taille du sprite
+            Size = Size * 3; // on peut zoomer la taille du sprite
 
         }
         else if (Texture == 1) {
             textureActuelle = 1;
             IdTex = G2D::InitTextureFromString(Size, textureAccrocheDroit);
-            Size = Size * 5; // on peut zoomer la taille du sprite
+            Size = Size * 3; // on peut zoomer la taille du sprite
         }
         else if (Texture == 2) {
             textureActuelle = 2;
             IdTex = G2D::InitTextureFromString(Size, textureAccrocheGauche);
-            Size = Size * 5; // on peut zoomer la taille du sprite
+            Size = Size * 3; // on peut zoomer la taille du sprite
         }
         else if (Texture == 3) {
             textureActuelle = 3;
             IdTex = G2D::InitTextureFromString(Size, textureSaut);
-            Size = Size * 5; // on peut zoomer la taille du sprite
+            Size = Size * 3; // on peut zoomer la taille du sprite
         }
     }
 };
@@ -258,17 +258,40 @@ bool getTapeUnMur(V2 newPos, V2 Size) {
 void gestionSaut() {
     if (G.Heros.getHauteurMax() > 0)
     {
-        G.Heros.Pos.y += 2;
-        G.Heros.setHauteurMax(G.Heros.getHauteurMax() - 2);
-        if (G.Heros.getHauteurMax() <= 0)
-        {
+        V2 newPos = G.Heros.Pos + V2(0,2);
+        if(getTapeUnMur(newPos, G.Heros.Size))
+        { 
             G.Heros.setHauteurMax(0);
             G.Heros.setTombe(true);
+        }
+        else {
+            G.Heros.Pos.y += 2;
+            G.Heros.setHauteurMax(G.Heros.getHauteurMax() - 2);
+            if (G.Heros.getHauteurMax() <= 0)
+            {
+                G.Heros.setHauteurMax(0);
+                G.Heros.setTombe(true);
+            }
         }
     }
     else if (G.Heros.tombe)
     {
-        V2 newPos = G.Heros.Pos - V2(0, 2);
+        V2 newPos;
+        if (G.Heros.textureActuelle == 1 || G.Heros.textureActuelle == 2)
+        {
+            if (getTapeUnMur(G.Heros.Pos + V2(4, 0), G.Heros.Size) || getTapeUnMur(G.Heros.Pos + V2(-4, 0), G.Heros.Size)) {
+                newPos = G.Heros.Pos - V2(0, 1);
+            }
+            else {
+                newPos = G.Heros.Pos - V2(0, 2);
+                G.Heros.setTexture(3);
+            }
+        }
+        else
+        {
+            newPos = G.Heros.Pos - V2(0, 2);
+        }
+        
         if (getTapeUnMur(newPos,G.Heros.Size))
         {
             G.Heros.setTombe(false);
@@ -277,14 +300,14 @@ void gestionSaut() {
         }
         else
         {
-            G.Heros.Pos.y -= 2;
+            G.Heros.Pos = newPos;
         }
     }
 }
 void switchBarreEspace() {
 
     if (G2D::IsKeyPressed(Key::SPACE) && G.Heros.getSautRestant() > 0 && !G.appuieSpaceBar) {
-        G.Heros.setHauteurMax(G.Heros.getHauteurMax() + 50);
+        G.Heros.setHauteurMax(G.Heros.getHauteurMax() + 70);
         G.Heros.setSautRestant(G.Heros.getSautRestant() - 1);
         G.appuieSpaceBar = !G.appuieSpaceBar;
         G.Heros.setTombe(false);
@@ -500,7 +523,7 @@ void AssetsInit() {
     G.TexturePack.Size =
         G.TexturePack.Size * 5; // on peut zoomer la taille du sprite
     G.Heros.IdTex = G2D::InitTextureFromString(G.Heros.Size, G.Heros.textureMarche);
-    G.Heros.Size = G.Heros.Size * 5; // on peut zoomer la taille du sprite
+    G.Heros.Size = G.Heros.Size * 3; // on peut zoomer la taille du sprite
 }
 int main(int argc, char* argv[]) {
     G2D::InitWindow(argc, argv, V2(G.Lpix * 40, G.Lpix * 20), V2(100, 100),
