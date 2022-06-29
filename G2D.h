@@ -71,7 +71,8 @@ enum class Key {
   F9,
   F10,
   F11,
-  F12
+  F12,
+  SPACE
 };
 
 namespace G2D {

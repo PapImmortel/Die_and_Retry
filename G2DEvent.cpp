@@ -66,6 +66,8 @@ void InitKeys()
 	keyTable['X'] = keyTable['x'] = Key::X;
 	keyTable['Y'] = keyTable['y'] = Key::Y;
 	keyTable['Z'] = keyTable['z'] = Key::Z;
+	keyTable[' '] = Key::SPACE;
+
 	keyTable['\r'] = Key::ENTER;
 	 
 	specialKeyTable[GLUT_KEY_LEFT]  = Key::LEFT;
@@ -84,6 +86,7 @@ void InitKeys()
 	specialKeyTable[GLUT_KEY_F10]   = Key::F10;
 	specialKeyTable[GLUT_KEY_F11]   = Key::F11;
 	specialKeyTable[GLUT_KEY_F12]   = Key::F12;
+
 }
 
 map<Key, bool> ActiveKeys;

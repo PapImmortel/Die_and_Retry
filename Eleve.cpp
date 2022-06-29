@@ -22,6 +22,68 @@ using namespace std;
 #define COMPTEUR_TRAP 50
 #define MIN_TRAP 70
 
+struct _NiveauDonjon {
+    string Map;
+    string Map1 =
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M           MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M   M       M MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "MMM M M MMM M MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M   M M     M MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M   M  M      MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M  M M MM MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M  M M M  MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M MM M MMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M    M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M MMMMMMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        ;
+    string Map2 =
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M           MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M   M       M MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "MMM M M MMM M MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M   M M     M MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M   M  M      MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M  M M MM MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M  M M M  MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M MM M MMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M    M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M M MMMMMMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM";
+
+    int niveau;
+    void setNiveau(int _niveau) { niveau = _niveau; }
+    int getNiveau() { return niveau; }
+    void setTexture() {
+        if (niveau == 1)
+        {
+            Map = Map1;
+        }
+        else if (niveau == 2)
+        {
+            Map = Map2;
+        }
+    }
+
+
+};
 
 struct Rectangle {
     int xMin, xMax, yMin, yMax;
@@ -41,7 +103,8 @@ struct _TexturePack {
         "[GSGWGGGG]"
         "[SGGSWSGS]"
         "[GGWSGGGS]"
-        "[GGGGSSGG]";
+        "[GGGGSSGG]"
+        ;
     string textureSol = "[LLFJLLFJ]"
         "[LLFJLFFJ]"
         "[LFFJLFFF]"
@@ -49,7 +112,8 @@ struct _TexturePack {
         "[FFJJLFJJ]"
         "[LFJJLFJJ]"
         "[LFFJLFFJ]"
-        "[LLFJLFFJ]";
+        "[LLFJLFFJ]"
+        ;
 
     V2 Size;
     int IdTexMur;
@@ -74,33 +138,72 @@ bool InterRectRect(Rectangle R1, Rectangle R2) {
 
 struct _Heros {
     int xMin, xMax, yMin, yMax, width;
-    string texture = "[RRR  ]"
-        "[RRWR ]"
-        "[RRR  ]"
-        "[YY   ]"
-        "[YYY  ]"
-        "[YY YG]"
-        "[GG   ]"
-        "[CC   ]"
-        "[CC   ]"
-        "[C C  ]"
-        "[C C  ]";
+    string textureAccrocheDroit = 
+        "[   KKK ]"
+        "[  K  CK]"
+        "[   KKK ]"
+        "[    K K]"
+        "[    KK ]"
+        "[    K  ]"
+        "[    KKK]"
+        "[    K  ]"
+        "[     K ]"
+        ;
+    string textureAccrocheGauche =
+        "[ KKK   ]"
+        "[KC  K  ]"
+        "[ KKK   ]"
+        "[K K    ]"
+        "[ KK    ]"
+        "[  K    ]"
+        "[KKK    ]"
+        "[  K    ]"
+        "[ K     ]"
+        ;
+    string textureSaut = "[  KKK  ]"
+        "[ KC CK ]"
+        "[  KKK  ]"
+        "[K  K  K]"
+        "[ KKKKK ]"
+        "[   K   ]"
+        "[   K   ]"
+        "[  K K  ]"
+        "[ K   K ]";
 
-    string texture2 = "[RRR  ]"
-        "[RRWR ]"
-        "[RRR  ]"
-        "[YY   ]"
-        "[YYY  ]"
-        "[YY YG]"
-        "[GG   ]"
-        "[CC   ]"
-        "[CCCC ]"
-        "[C   C]"
-        "[C    ]";
-
-
+    V2 Size;
+    int IdTex;
+    int textureActuelle;
+    int sautRestant = 2;
+    
+    V2 Pos = V2(45, 45);
     Rectangle getRect() {
         return Rectangle(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y);
+    }
+    void setSautRestant(int _SautRestant) {
+        sautRestant = _SautRestant;
+    }
+    int getSautRestant() {
+        return sautRestant;
+    }
+    void setTexture(int Texture) {
+        
+        if (Texture==0) {
+
+            textureActuelle = 0;
+            IdTex = G2D::InitTextureFromString(Size, textureSaut);
+            Size = Size * 2; // on peut zoomer la taille du sprite
+
+        }
+        else if (Texture == 1) {
+            textureActuelle = 1;
+            IdTex = G2D::InitTextureFromString(Size, textureAccrocheDroit);
+            Size = Size * 2; // on peut zoomer la taille du sprite
+        }
+        else if (Texture == 2) {
+            textureActuelle = 2;
+            IdTex = G2D::InitTextureFromString(Size, textureAccrocheGauche);
+            Size = Size * 2; // on peut zoomer la taille du sprite
+        }
     }
 };
 
@@ -110,10 +213,18 @@ struct _Heros {
 
 struct GameData {
     
+    _NiveauDonjon NiveauDonjon;
+
+    bool Mur(int x, int y) { return NiveauDonjon.Map[(20 - y - 1) * 40 + x] == 'M'; }
+    int Lpix = 40;
+    int ecran = 0;
+    _Heros Heros;
+    _TexturePack TexturePack;
     GameData() {}
 };
 
 GameData G;
+
 
 void affichage_ecran_accueil() {
     G2D::DrawStringFontMono(V2(50, 400), "Bienvenue dans le jeu du labyrinthe !",
@@ -141,7 +252,6 @@ void affichage_ecran_options() {
 }
 
 void affichage_init_partie() {
-    G2D::DrawStringFontMono(V2(220, 300), Niveau, 20, 3, Color::White);
     G2D::DrawStringFontMono(V2(220, 100), "Appuyez sur ENTER", 16, 3, Color::Cyan);
     G2D::DrawCircle(V2(150, 250), 50, Color::Green);
     G2D::DrawCircle(V2(450, 450), 30, Color::Cyan);
@@ -150,8 +260,8 @@ void affichage_init_partie() {
 }
 
 void affichage_ecran_jeu() {
-    for (int x = 0; x < 15; x++)
-        for (int y = 0; y < 15; y++) {
+    for (int x = 0; x < 40; x++)
+        for (int y = 0; y < 20; y++) {
             int xx = x * G.Lpix - 6;
             int yy = y * G.Lpix;
             if (G.Mur(x, y))
@@ -164,7 +274,6 @@ void affichage_ecran_jeu() {
         }
 
     
-    G2D::DrawRectangle(G.Heros.Pos, G.Heros.Size, Color::Red);
     G2D::DrawRectWithTexture(G.Heros.IdTex, G.Heros.Pos, G.Heros.Size);
 
     
@@ -182,7 +291,6 @@ void affichage_ecran_win() {
     G2D::DrawStringFontMono(V2(50, 200),
         "Appuyez sur ENTER pour faire une autre partie.", 16,
         3, Color::White);
-    G2D::DrawStringFontMono(V2(70, 300), score, 20, 3, Color::Yellow);
 }
 void render() {
     G2D::ClearScreen(Color::Black);
@@ -207,13 +315,6 @@ void render() {
     G2D::Show();
 }
 
-bool getTapeUnMur(V2 newPos, V2 Size) {
-    return (G.Mur(newPos.x / 40, newPos.y / 40)) ||
-        (G.Mur((newPos.x + Size.x) / 40, (newPos.y + Size.y) / 40)) ||
-        (G.Mur((newPos.x) / 40, (newPos.y + Size.y) / 40)) ||
-        (G.Mur((newPos.x + Size.x) / 40, (newPos.y) / 40));
-}
-
 
 int gestion_ecran_accueil() {
     if (G2D::IsKeyPressed(Key::ENTER)) {
@@ -224,7 +325,6 @@ int gestion_ecran_accueil() {
 int gestion_ecran_options() {
     // * facile
     if (G2D::IsKeyPressed(Key::A)) {
-        G.difficulty = 0;
         return 2;
     }
     return 1;
@@ -239,6 +339,17 @@ int InitPartie() {
     return 2;
 }
 int gestion_ecran_jeu() {
+    if (G2D::IsKeyPressed(Key::Q)) {
+        G.Heros.Pos.x-=4;
+    }
+
+    if (G2D::IsKeyPressed(Key::D)) {
+        G.Heros.Pos.x+=4;
+    }
+    if (G2D::IsKeyPressed(Key::SPACE)) {
+        G.Heros.Pos.y += 4;
+    }
+
 
     return 3;
 }
@@ -278,11 +389,20 @@ void Logic() {
 }
 
 void AssetsInit() {
+    G.NiveauDonjon.setNiveau(1);
+    G.NiveauDonjon.setTexture();
 
-    
+    G.TexturePack.IdTexMur =
+        G2D::InitTextureFromString(G.TexturePack.Size, G.TexturePack.textureMur);
+    G.TexturePack.IdTexSol =
+        G2D::InitTextureFromString(G.TexturePack.Size, G.TexturePack.textureSol);
+    G.TexturePack.Size =
+        G.TexturePack.Size * 5; // on peut zoomer la taille du sprite
+    G.Heros.IdTex = G2D::InitTextureFromString(G.Heros.Size, G.Heros.textureAccrocheDroit);
+    G.Heros.Size = G.Heros.Size * 5; // on peut zoomer la taille du sprite
 }
 int main(int argc, char* argv[]) {
-    G2D::InitWindow(argc, argv, V2(G.Lpix * 15, G.Lpix * 15), V2(200, 200),
+    G2D::InitWindow(argc, argv, V2(G.Lpix * 40, G.Lpix * 20), V2(100, 100),
         string("Labyrinthe"));
 
     AssetsInit();
