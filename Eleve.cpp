@@ -283,13 +283,13 @@ void gestionSaut() {
                 newPos = G.Heros.Pos - V2(0, 1);
             }
             else {
-                newPos = G.Heros.Pos - V2(0, 2);
+                newPos = G.Heros.Pos - V2(0, 3);
                 G.Heros.setTexture(3);
             }
         }
         else
         {
-            newPos = G.Heros.Pos - V2(0, 2);
+            newPos = G.Heros.Pos - V2(0, 3);
         }
         
         if (getTapeUnMur(newPos,G.Heros.Size))
@@ -302,6 +302,10 @@ void gestionSaut() {
         {
             G.Heros.Pos = newPos;
         }
+    }
+    else if (!getTapeUnMur(G.Heros.Pos + V2(0, -1), G.Heros.Size)) {
+        G.Heros.setHauteurMax(0);
+        G.Heros.setTombe(true);
     }
 }
 void switchBarreEspace() {
