@@ -44,7 +44,7 @@ struct _NiveauDonjon {
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
         ;
     string Map2 =
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
@@ -66,7 +66,7 @@ struct _NiveauDonjon {
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
         "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM";
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM";
 
     int niveau;
     void setNiveau(int _niveau) { niveau = _niveau; }
@@ -139,26 +139,26 @@ bool InterRectRect(Rectangle R1, Rectangle R2) {
 struct _Heros {
     int xMin, xMax, yMin, yMax, width;
     string textureAccrocheDroit = 
-        "[   KKK ]"
-        "[  K  CK]"
-        "[   KKK ]"
-        "[    K K]"
+        "[ KKK   ]"
+        "[K  CK  ]"
+        "[ KKK   ]"
+        "[  K   K]"
+        "[  KKKK ]"
+        "[  K    ]"
+        "[  KKKKK]"
         "[    KK ]"
-        "[    K  ]"
-        "[    KKK]"
-        "[    K  ]"
-        "[     K ]"
+        "[      K]"
         ;
     string textureAccrocheGauche =
-        "[ KKK   ]"
-        "[KC  K  ]"
-        "[ KKK   ]"
-        "[K K    ]"
+        "[   KKK ]"
+        "[  KC  K]"
+        "[   KKK ]"
+        "[K   K  ]"
+        "[ KKKK  ]"
+        "[    K  ]"
+        "[KKKKK  ]"
         "[ KK    ]"
-        "[  K    ]"
-        "[KKK    ]"
-        "[  K    ]"
-        "[ K     ]"
+        "[K      ]"
         ;
     string textureSaut = "[  KKK  ]"
         "[ KC CK ]"
@@ -169,15 +169,34 @@ struct _Heros {
         "[   K   ]"
         "[  K K  ]"
         "[ K   K ]";
+    string textureMarche = "[  KKK  ]"
+        "[ KC CK ]"
+        "[  KKK  ]"
+        "[   K   ]"
+        "[  KKK  ]"
+        "[ K K K ]"
+        "[K  K  K]"
+        "[  K K  ]"
+        "[ K   K ]";
 
     V2 Size;
     int IdTex;
     int textureActuelle;
     int sautRestant = 2;
-    
-    V2 Pos = V2(45, 45);
+    int hauteurMax = 0;
+    bool tombe = false;
+    void setTombe(bool _tombe) {
+        tombe = _tombe;
+    }
+    V2 Pos = V2(120, 60);
     Rectangle getRect() {
         return Rectangle(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y);
+    }
+    void setHauteurMax(int _hauteurMax){
+        hauteurMax = _hauteurMax;
+    }
+    int getHauteurMax() {
+        return hauteurMax;
     }
     void setSautRestant(int _SautRestant) {
         sautRestant = _SautRestant;
@@ -190,19 +209,24 @@ struct _Heros {
         if (Texture==0) {
 
             textureActuelle = 0;
-            IdTex = G2D::InitTextureFromString(Size, textureSaut);
-            Size = Size * 2; // on peut zoomer la taille du sprite
+            IdTex = G2D::InitTextureFromString(Size, textureMarche);
+            Size = Size * 5; // on peut zoomer la taille du sprite
 
         }
         else if (Texture == 1) {
             textureActuelle = 1;
             IdTex = G2D::InitTextureFromString(Size, textureAccrocheDroit);
-            Size = Size * 2; // on peut zoomer la taille du sprite
+            Size = Size * 5; // on peut zoomer la taille du sprite
         }
         else if (Texture == 2) {
             textureActuelle = 2;
             IdTex = G2D::InitTextureFromString(Size, textureAccrocheGauche);
-            Size = Size * 2; // on peut zoomer la taille du sprite
+            Size = Size * 5; // on peut zoomer la taille du sprite
+        }
+        else if (Texture == 3) {
+            textureActuelle = 3;
+            IdTex = G2D::InitTextureFromString(Size, textureSaut);
+            Size = Size * 5; // on peut zoomer la taille du sprite
         }
     }
 };
@@ -218,14 +242,85 @@ struct GameData {
     bool Mur(int x, int y) { return NiveauDonjon.Map[(20 - y - 1) * 40 + x] == 'M'; }
     int Lpix = 40;
     int ecran = 0;
+    bool appuieSpaceBar = false;
     _Heros Heros;
     _TexturePack TexturePack;
     GameData() {}
 };
 
 GameData G;
+bool getTapeUnMur(V2 newPos, V2 Size) {
+    return (G.Mur(newPos.x / 40, newPos.y / 40)) ||
+        (G.Mur((newPos.x + Size.x) / 40, (newPos.y + Size.y) / 40)) ||
+        (G.Mur((newPos.x) / 40, (newPos.y + Size.y) / 40)) ||
+        (G.Mur((newPos.x + Size.x) / 40, (newPos.y) / 40));
+}
+void gestionSaut() {
+    if (G.Heros.getHauteurMax() > 0)
+    {
+        G.Heros.Pos.y += 2;
+        G.Heros.setHauteurMax(G.Heros.getHauteurMax() - 2);
+        if (G.Heros.getHauteurMax() <= 0)
+        {
+            G.Heros.setHauteurMax(0);
+            G.Heros.setTombe(true);
+        }
+    }
+    else if (G.Heros.tombe)
+    {
+        V2 newPos = G.Heros.Pos - V2(0, 2);
+        if (getTapeUnMur(newPos,G.Heros.Size))
+        {
+            G.Heros.setTombe(false);
+            G.Heros.setSautRestant(2);
+            G.Heros.setTexture(0);
+        }
+        else
+        {
+            G.Heros.Pos.y -= 2;
+        }
+    }
+}
+void switchBarreEspace() {
 
+    if (G2D::IsKeyPressed(Key::SPACE) && G.Heros.getSautRestant() > 0 && !G.appuieSpaceBar) {
+        G.Heros.setHauteurMax(G.Heros.getHauteurMax() + 50);
+        G.Heros.setSautRestant(G.Heros.getSautRestant() - 1);
+        G.appuieSpaceBar = !G.appuieSpaceBar;
+        G.Heros.setTombe(false);
+        if (G.Heros.textureActuelle!=3)
+        {
+            G.Heros.setTexture(3);
+        }
 
+    }
+    else if (!G2D::IsKeyPressed(Key::SPACE) && G.appuieSpaceBar) {
+        G.appuieSpaceBar = !G.appuieSpaceBar;
+    }
+
+}
+void collision(_Heros& heros) {
+    if (getTapeUnMur(heros.Pos, heros.Size)) {
+        if (G2D::IsKeyPressed(Key::Q))
+        {
+            heros.Pos.x += 4;
+            if (heros.textureActuelle != 2)
+            {
+                heros.setTexture(2);
+            }
+        }
+        if (G2D::IsKeyPressed(Key::D)) {
+
+        
+            heros.Pos.x-=4;
+            if (heros.textureActuelle != 1)
+            {
+                heros.setTexture(1);
+            }
+        }
+    }
+    
+}
 void affichage_ecran_accueil() {
     G2D::DrawStringFontMono(V2(50, 400), "Bienvenue dans le jeu du labyrinthe !",
         20, 4, Color::White);
@@ -273,8 +368,13 @@ void affichage_ecran_jeu() {
             }
         }
 
-    
-    G2D::DrawRectWithTexture(G.Heros.IdTex, G.Heros.Pos, G.Heros.Size);
+    if (G.Heros.textureActuelle!=0) {
+        if (getTapeUnMur(G.Heros.Pos + V2(0, -2), G.Heros.Size))
+        {
+            G.Heros.setTexture(0);
+        }
+    }
+        G2D::DrawRectWithTexture(G.Heros.IdTex, G.Heros.Pos, G.Heros.Size);
 
     
 }
@@ -340,15 +440,16 @@ int InitPartie() {
 }
 int gestion_ecran_jeu() {
     if (G2D::IsKeyPressed(Key::Q)) {
-        G.Heros.Pos.x-=4;
+        G.Heros.Pos.x -= 4;
     }
 
-    if (G2D::IsKeyPressed(Key::D)) {
+    if (G2D::IsKeyPressed(Key::D)){
         G.Heros.Pos.x+=4;
     }
-    if (G2D::IsKeyPressed(Key::SPACE)) {
-        G.Heros.Pos.y += 4;
-    }
+    collision(G.Heros);
+    switchBarreEspace();
+    gestionSaut();
+
 
 
     return 3;
@@ -398,7 +499,7 @@ void AssetsInit() {
         G2D::InitTextureFromString(G.TexturePack.Size, G.TexturePack.textureSol);
     G.TexturePack.Size =
         G.TexturePack.Size * 5; // on peut zoomer la taille du sprite
-    G.Heros.IdTex = G2D::InitTextureFromString(G.Heros.Size, G.Heros.textureAccrocheDroit);
+    G.Heros.IdTex = G2D::InitTextureFromString(G.Heros.Size, G.Heros.textureMarche);
     G.Heros.Size = G.Heros.Size * 5; // on peut zoomer la taille du sprite
 }
 int main(int argc, char* argv[]) {

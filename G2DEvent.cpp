@@ -18,7 +18,7 @@
 #include <map>
 #include <vector>
 #include <chrono>
- 
+
 
 using namespace std;
 
@@ -30,7 +30,7 @@ using namespace std;
 //	    Key Management
 //
 /////////////////////////////////////////////////////////////
- 
+
 
 
 Key keyTable[256];
@@ -69,38 +69,37 @@ void InitKeys()
 	keyTable[' '] = Key::SPACE;
 
 	keyTable['\r'] = Key::ENTER;
-	 
-	specialKeyTable[GLUT_KEY_LEFT]  = Key::LEFT;
-	specialKeyTable[GLUT_KEY_DOWN]  = Key::DOWN;
-	specialKeyTable[GLUT_KEY_RIGHT] = Key::RIGHT;
-	specialKeyTable[GLUT_KEY_UP]    = Key::UP;
-	specialKeyTable[GLUT_KEY_F1]    = Key::F1;
-	specialKeyTable[GLUT_KEY_F2]    = Key::F2;
-	specialKeyTable[GLUT_KEY_F3]    = Key::F3;
-	specialKeyTable[GLUT_KEY_F4]    = Key::F4;
-	specialKeyTable[GLUT_KEY_F5]    = Key::F5;
-	specialKeyTable[GLUT_KEY_F6]    = Key::F6;
-	specialKeyTable[GLUT_KEY_F7]    = Key::F7;
-	specialKeyTable[GLUT_KEY_F8]    = Key::F8;
-	specialKeyTable[GLUT_KEY_F9]    = Key::F9;
-	specialKeyTable[GLUT_KEY_F10]   = Key::F10;
-	specialKeyTable[GLUT_KEY_F11]   = Key::F11;
-	specialKeyTable[GLUT_KEY_F12]   = Key::F12;
 
+	specialKeyTable[GLUT_KEY_LEFT] = Key::LEFT;
+	specialKeyTable[GLUT_KEY_DOWN] = Key::DOWN;
+	specialKeyTable[GLUT_KEY_RIGHT] = Key::RIGHT;
+	specialKeyTable[GLUT_KEY_UP] = Key::UP;
+	specialKeyTable[GLUT_KEY_F1] = Key::F1;
+	specialKeyTable[GLUT_KEY_F2] = Key::F2;
+	specialKeyTable[GLUT_KEY_F3] = Key::F3;
+	specialKeyTable[GLUT_KEY_F4] = Key::F4;
+	specialKeyTable[GLUT_KEY_F5] = Key::F5;
+	specialKeyTable[GLUT_KEY_F6] = Key::F6;
+	specialKeyTable[GLUT_KEY_F7] = Key::F7;
+	specialKeyTable[GLUT_KEY_F8] = Key::F8;
+	specialKeyTable[GLUT_KEY_F9] = Key::F9;
+	specialKeyTable[GLUT_KEY_F10] = Key::F10;
+	specialKeyTable[GLUT_KEY_F11] = Key::F11;
+	specialKeyTable[GLUT_KEY_F12] = Key::F12;
 }
 
 map<Key, bool> ActiveKeys;
-  
-void keyboard(unsigned char key, int x, int y)   
-{   
-	if (key == 0x1b) exit(0);
-	ActiveKeys[keyTable[key]] = true;   
-}
-void keyUp(unsigned char key, int x, int y)       {   ActiveKeys[keyTable[key]] = false;  }
- 
 
-void keySpecial(int key, int x, int y)            {    ActiveKeys[specialKeyTable[key]] = true; }
-void keySpecialUp(int key, int x, int y)          {    ActiveKeys[specialKeyTable[key]] = false; }
+void keyboard(unsigned char key, int x, int y)
+{
+	if (key == 0x1b) exit(0);
+	ActiveKeys[keyTable[key]] = true;
+}
+void keyUp(unsigned char key, int x, int y) { ActiveKeys[keyTable[key]] = false; }
+
+
+void keySpecial(int key, int x, int y) { ActiveKeys[specialKeyTable[key]] = true; }
+void keySpecialUp(int key, int x, int y) { ActiveKeys[specialKeyTable[key]] = false; }
 
 bool G2D::IsKeyPressed(Key k)
 {
@@ -129,33 +128,60 @@ void reshape(int w, int h)
 //
 /////////////////////////////////////////////////////////////
 
-struct mouseEvent { int x; int y; bool clicked; };
- 
-mouseEvent mousePress[3];
+bool mousePressed[16] = { false, false, false };
+bool mouseClicked[16] = { false, false, false };
 
-void G2D::GetMouseButtonInfo(int idButton, bool & clicked, int & x, int & y)
+int  MouseX = 300;
+int  MouseY = 300;
+
+void G2D::GetMousePos(int* x, int* y)
 {
-	if (mousePress[idButton].clicked == false) { clicked = false; return; }
-	// read and erase
-	clicked = true;
-	x = mousePress[idButton].x;
-	y = mousePress[idButton].y;
-	mousePress[idButton].clicked = false;
+	*x = MouseX;
+	*y = MouseY;
 }
 
+bool G2D::DetectLeftClick()
+{
+
+	bool r = mouseClicked[GLUT_LEFT_BUTTON];
+	mouseClicked[GLUT_LEFT_BUTTON] = false; // on efface l'ev click
+	return r;
+}
+
+bool G2D::DetectRightClick()
+{
+	bool r = mouseClicked[GLUT_RIGHT_BUTTON];
+	mouseClicked[GLUT_RIGHT_BUTTON] = false; // on efface l'ev click
+	return r;
+}
+
+
+bool G2D::IsAnyMouseButtonPressed()
+{
+	return mousePressed[0] | mousePressed[1] | mousePressed[2];
+}
+
+bool G2D::IsMouseLeftButtonPressed()
+{
+	return mousePressed[GLUT_LEFT_BUTTON];
+}
+
+bool G2D::IsMouseRightButtonPressed()
+{
+	return mousePressed[GLUT_RIGHT_BUTTON];
+}
+void mouseMove(int x, int y)
+{
+	MouseX = x;
+	MouseY = Wheight - y;
+}
 void mouse(int button, int state, int x, int y)
 {
-	mouseEvent M;
-	M.x = x;
-	M.y = Wheight-y;
-	M.clicked = true;
-	if (state == GLUT_DOWN)
-		mousePress[button] = M;
-
-	//  GLUT_LEFT_BUTTON    GLUT_MIDDLE_BUTTON 
-
-	cout << x << "   " << y << "   " << state << endl;
+	if (state == GLUT_DOWN) { mousePressed[button] = true;   mouseClicked[button] = true; mouseMove(x, y); }
+	if (state == GLUT_UP) { mousePressed[button] = false;  mouseClicked[button] = false; mouseMove(x, y); }
 }
+
+
 
 
 
@@ -169,11 +195,11 @@ void mouse(int button, int state, int x, int y)
 
 void InitColors();
 
-void G2D::InitWindow(int & argc, char** & argv, V2 WindowSize, V2 WindowStartPos, std::string name)
+void G2D::InitWindow(int& argc, char**& argv, V2 WindowSize, V2 WindowStartPos, std::string name)
 {
 	glutInit(&argc, argv);
 
-	Wwidth  = WindowSize.x;
+	Wwidth = WindowSize.x;
 	Wheight = WindowSize.y;
 
 	glutInitWindowPosition(WindowStartPos.x, WindowStartPos.y);
@@ -181,7 +207,7 @@ void G2D::InitWindow(int & argc, char** & argv, V2 WindowSize, V2 WindowStartPos
 	glutInitWindowSize(Wwidth, Wheight);
 	glutCreateWindow(name.c_str());
 
- 
+
 	InitColors();
 }
 
@@ -190,9 +216,9 @@ void(*_animCallBack)(void);
 typedef std::chrono::high_resolution_clock Time;
 typedef std::chrono::duration<double> duration;
 
-auto T0             = Time::now();
+auto T0 = Time::now();
 auto TPreviousFrame = Time::now();
-auto TNewFrame      = Time::now();
+auto TNewFrame = Time::now();
 
 bool FirstFrame = true;
 
@@ -200,10 +226,10 @@ void anim(int value)
 {
 	if (FirstFrame)
 	{
-		T0             = Time::now();   // démarrage du jeu
+		T0 = Time::now();   // démarrage du jeu
 		TPreviousFrame = Time::now();
-		TNewFrame      = Time::now();
-		FirstFrame     = false;
+		TNewFrame = Time::now();
+		FirstFrame = false;
 	}
 	else
 	{
@@ -212,11 +238,11 @@ void anim(int value)
 	}
 	_animCallBack();
 	glutPostRedisplay();
-	glutTimerFunc(10, anim, value);	
-	
+	glutTimerFunc(10, anim, value);
+
 }
 
- 
+
 double G2D::ElapsedTimeFromStartSeconds()
 {
 	duration elapsed = TNewFrame - T0;
@@ -229,7 +255,7 @@ double G2D::ElapsedTimeFromLastCallbackSeconds()
 	return elapsed.count();
 }
 
- 
+
 
 void G2D::Run(void logic(), void render())
 {
@@ -258,6 +284,7 @@ void G2D::Run(void logic(), void render())
 	glutSpecialFunc(keySpecial);
 	glutSpecialUpFunc(keySpecialUp);
 	glutMouseFunc(mouse);
+	glutMotionFunc(mouseMove);
 
 
 	// logic
