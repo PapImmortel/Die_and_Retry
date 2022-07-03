@@ -16,56 +16,50 @@ using namespace std;
 #define ECRAN_GAME_OVER 4
 #define ECRAN_WIN 5
 
-#define SCORE_MOMIE 200
-#define SCORE_DIAMOND 150
-
-#define COMPTEUR_TRAP 50
-#define MIN_TRAP 70
 
 struct _NiveauDonjon {
     string Map;
     string Map1 =
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M           MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M   M       M MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "MMM M M MMM M MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M   M M     M MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M   M  M      MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M  M M MM MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M  M M M  MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M MM M MMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M    M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M MMMMMMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M  M   M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        ;
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M       MMM                            M"
+        "M       MMMM                           M"
+        "M                                      M"
+        "M        M       MMMM                  M"
+        "M       MM       MMMM                  M"
+        "M      MMMM                            M"
+        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM";
     string Map2 =
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M           MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M   M       M MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "MMM M M MMM M MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M   M M     M MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M MMM MMM MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M   M  M      MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M  M M MM MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M  M M M  MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M MM M MMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M    M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M M MMMMMMM MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
-        "M M      M    MMMMMMMMMMMMMMMMMMMMMMMMMM"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M                                      M"
+        "M       MMM                            M"
+        "M                                      M"
+        "M                                      M"
+        "M        M       MMMM                  M"
+        "M       MMM                            M"
+        "M       MMM                            M"
         "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM";
 
     int niveau;
@@ -231,6 +225,28 @@ struct _Heros {
     }
 };
 
+struct _Mur
+{
+    string texture =
+        "[SGGWSSWS]"
+        "[GSSSGGSW]"
+        "[GSGGGGSS]"
+        "[WSSGGWGG]"
+        "[GSGWGGGG]"
+        "[SGGSWSGS]"
+        "[GGWSGGGS]"
+        "[GGGGSSGG]"
+        ;
+    V2 Size;
+    int IdTex;
+    V2 Pos;
+
+
+    _Mur(V2 _Pos) { Pos = _Pos; }
+    Rectangle getRect() {
+        return Rectangle(Pos.x, Pos.y, Pos.x + Size.x, Pos.y + Size.y);
+    }
+};
 
 
 
@@ -245,11 +261,30 @@ struct GameData {
     bool appuieSpaceBar = false;
     _Heros Heros;
     _TexturePack TexturePack;
+    vector<_Mur> murs = {};
+    void setMurs() {
+        murs.clear();
+        murs.push_back(_Mur(V2(530, 367)));
+        murs.push_back(_Mur(V2(48, 535)));
+        murs.push_back(_Mur(V2(253, 290)));
+
+        for (_Mur& mur : murs) {
+            mur.IdTex = G2D::InitTextureFromString(mur.Size, mur.texture);
+            mur.Size = mur.Size * 3; // on peut zoomer la taille du sprite
+        }
+    }
     GameData() {}
 };
 
 GameData G;
 bool getTapeUnMur(V2 newPos, V2 Size) {
+    for (_Mur& mur : G.murs) {
+        if (InterRectRect(Rectangle(newPos.x, newPos.y, newPos.x + Size.x, newPos.y + Size.y), mur.getRect()))
+        {
+            return true;
+        }
+    }
+
     return (G.Mur(newPos.x / 40, newPos.y / 40)) ||
         (G.Mur((newPos.x + Size.x) / 40, (newPos.y + Size.y) / 40)) ||
         (G.Mur((newPos.x) / 40, (newPos.y + Size.y) / 40)) ||
@@ -258,50 +293,58 @@ bool getTapeUnMur(V2 newPos, V2 Size) {
 void gestionSaut() {
     if (G.Heros.getHauteurMax() > 0)
     {
-        V2 newPos = G.Heros.Pos + V2(0,2);
-        if(getTapeUnMur(newPos, G.Heros.Size))
-        { 
-            G.Heros.setHauteurMax(0);
-            G.Heros.setTombe(true);
-        }
-        else {
-            G.Heros.Pos.y += 2;
-            G.Heros.setHauteurMax(G.Heros.getHauteurMax() - 2);
-            if (G.Heros.getHauteurMax() <= 0)
+        for (int i = 0; i < 2; i++)
+        {
+            if (getTapeUnMur(G.Heros.Pos + V2(0,1), G.Heros.Size))
             {
                 G.Heros.setHauteurMax(0);
                 G.Heros.setTombe(true);
+                return;
+            }
+            
+            else {
+                G.Heros.Pos.y += 1;
+                G.Heros.setHauteurMax(G.Heros.getHauteurMax() - 2);
+                if (G.Heros.getHauteurMax() <= 0)
+                {
+                    G.Heros.setHauteurMax(0);
+                    G.Heros.setTombe(true);
+                }
             }
         }
     }
     else if (G.Heros.tombe)
     {
-        V2 newPos;
+        int nbMoove;
         if (G.Heros.textureActuelle == 1 || G.Heros.textureActuelle == 2)
         {
-            if (getTapeUnMur(G.Heros.Pos + V2(4, 0), G.Heros.Size) || getTapeUnMur(G.Heros.Pos + V2(-4, 0), G.Heros.Size)) {
-                newPos = G.Heros.Pos - V2(0, 1);
+            if (getTapeUnMur(G.Heros.Pos + V2(1, 0), G.Heros.Size) || getTapeUnMur(G.Heros.Pos + V2(-1, 0), G.Heros.Size)) {
+                nbMoove = 1;
             }
             else {
-                newPos = G.Heros.Pos - V2(0, 3);
+                nbMoove = 3;
                 G.Heros.setTexture(3);
             }
         }
         else
         {
-            newPos = G.Heros.Pos - V2(0, 3);
+            nbMoove = 3;
+        }
+        for (int i = 0; i < nbMoove; i++)
+        {
+            if (getTapeUnMur(G.Heros.Pos + V2(0,-1), G.Heros.Size))
+            {
+                G.Heros.setTombe(false);
+                G.Heros.setSautRestant(2);
+                G.Heros.setTexture(0);
+                return;
+            }
+            else
+            {
+                G.Heros.Pos.y -=1;
+            }
         }
         
-        if (getTapeUnMur(newPos,G.Heros.Size))
-        {
-            G.Heros.setTombe(false);
-            G.Heros.setSautRestant(2);
-            G.Heros.setTexture(0);
-        }
-        else
-        {
-            G.Heros.Pos = newPos;
-        }
     }
     else if (!getTapeUnMur(G.Heros.Pos + V2(0, -1), G.Heros.Size)) {
         G.Heros.setHauteurMax(0);
@@ -311,7 +354,7 @@ void gestionSaut() {
 void switchBarreEspace() {
 
     if (G2D::IsKeyPressed(Key::SPACE) && G.Heros.getSautRestant() > 0 && !G.appuieSpaceBar) {
-        G.Heros.setHauteurMax(G.Heros.getHauteurMax() + 70);
+        G.Heros.setHauteurMax(G.Heros.getHauteurMax() + 100);
         G.Heros.setSautRestant(G.Heros.getSautRestant() - 1);
         G.appuieSpaceBar = !G.appuieSpaceBar;
         G.Heros.setTombe(false);
@@ -326,11 +369,12 @@ void switchBarreEspace() {
     }
 
 }
-void collision(_Heros& heros) {
+bool collision(_Heros& heros) {
     if (getTapeUnMur(heros.Pos, heros.Size)) {
+
         if (G2D::IsKeyPressed(Key::Q))
         {
-            heros.Pos.x += 4;
+            heros.Pos.x += 1;
             if (heros.textureActuelle != 2)
             {
                 heros.setTexture(2);
@@ -339,15 +383,19 @@ void collision(_Heros& heros) {
         if (G2D::IsKeyPressed(Key::D)) {
 
         
-            heros.Pos.x-=4;
+            heros.Pos.x-=1;
             if (heros.textureActuelle != 1)
             {
                 heros.setTexture(1);
             }
         }
+        return true;
     }
+
+    return false;
     
 }
+
 void affichage_ecran_accueil() {
     G2D::DrawStringFontMono(V2(50, 400), "Bienvenue dans le jeu du labyrinthe !",
         20, 4, Color::White);
@@ -394,6 +442,9 @@ void affichage_ecran_jeu() {
                     G.TexturePack.Size);
             }
         }
+    for (_Mur& mur : G.murs) {
+        G2D::DrawRectWithTexture(mur.IdTex, mur.Pos, mur.Size);   
+    }
 
     if (G.Heros.textureActuelle!=0) {
         if (getTapeUnMur(G.Heros.Pos + V2(0, -2), G.Heros.Size))
@@ -460,20 +511,33 @@ int gestion_ecran_options() {
 int InitPartie() {
     
     if (G2D::IsKeyPressed(Key::ENTER)) {
-        
+        G.setMurs();
         return 3;
     }
     return 2;
 }
 int gestion_ecran_jeu() {
     if (G2D::IsKeyPressed(Key::Q)) {
-        G.Heros.Pos.x -= 4;
+        for (int i = 0; i < 4; i++)
+        {
+            G.Heros.Pos.x -= 1;
+            if (collision(G.Heros)) 
+            {
+                break;
+            }
+        }
     }
 
-    if (G2D::IsKeyPressed(Key::D)){
-        G.Heros.Pos.x+=4;
+    if (G2D::IsKeyPressed(Key::D)) {
+        for (int i = 0; i < 4; i++)
+        {
+            G.Heros.Pos.x += 1;
+            if (collision(G.Heros))
+            {
+                break;
+            }
+        }
     }
-    collision(G.Heros);
     switchBarreEspace();
     gestionSaut();
 
